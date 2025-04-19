@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PRAKALYA NETZONE</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #eef3f9; margin: 0; padding: 20px; text-align: center; }
+    h1 { color: #0056d6; margin-bottom: 20px; }
+    .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    input, select, textarea, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; }
+    button { background: #0056d6; color: white; font-weight: bold; border: none; cursor: pointer; }
+    button:hover { background: #0043aa; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <h1>PRAKALYA NETZONE</h1>
+  <div class="container" id="loginSection">
+    <input type="text" id="userid" placeholder="User ID">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+  </div>
+
+  <!-- Staff Entry Form -->
+  <div class="container hidden" id="staffSection">
+    <input type="date" id="date">
+    <select id="wallet">
+      <option value="">Select Wallet</option>
+      <option value="BOB SATHYA">BOB SATHYA</option>
+      <option value="HDFC MURUGESAN">HDFC MURUGESAN</option>
+      <option value="SBI">SBI</option>
+      <option value="SURIYA GPAY">SURIYA GPAY</option>
+      <option value="CSC MURUGESAN">CSC MURUGESAN</option>
+      <option value="OTHERS 1">OTHERS 1</option>
+      <option value="OTHERS 2">OTHERS 2</option>
+      <option value="OTHERS 3">OTHERS 3</option>
+      <option value="OTHERS 4">OTHERS 4</option>
+    </select>
+    <input type="number" id="closing" placeholder="Closing Balance">
+    <textarea id="note" placeholder="Notes (if any)"></textarea>
+    <input type="text" id="staffName" placeholder="Enter Your Name">
+    <button onclick="submitEntry()">Submit</button>
+    <button onclick="logout()" style="background:#ccc; color:#000;">Logout</button>
+  </div>
+
+  <!-- Boss Dashboard Placeholder -->
+  <div class="container hidden" id="bossSection">
+    <p>
+      <label>From: <input type="date" id="fromDate"></label><br>
+      <label>To: <input type="date" id="toDate"></label><br>
+      <label>Wallet: 
+        <select id="walletFilter">
+          <option value="">All</option>
+          <option value="BOB SATHYA">BOB SATHYA</option>
+          <option value="HDFC MURUGESAN">HDFC MURUGESAN</option>
+          <option value="SBI">SBI</option>
+          <option value="SURIYA GPAY">SURIYA GPAY</option>
+          <option value="CSC MURUGESAN">CSC MURUGESAN</option>
+          <option value="OTHERS 1">OTHERS 1</option>
+          <option value="OTHERS 2">OTHERS 2</option>
+          <option value="OTHERS 3">OTHERS 3</option>
+          <option value="OTHERS 4">OTHERS 4</option>
+        </select>
+      </label><br>
+      <label>Staff: <input type="text" id="staffFilter" placeholder="Staff name/code"></label>
+    </p>
+    <button onclick="refreshData()">🔁 Refresh</button>
+    <button>📤 Export to Excel</button>
+    <button>📤 Export to PDF</button>
+    <button onclick="logout()" style="background:#ccc; color:#000;">Logout</button>
+  </div>
+
+  <script>
+    // Preload 001 to 010 if not present
+    if (!localStorage.getItem('staffUsers')) {
+      const staffUsers = {};
+      for (let i = 1; i <= 10; i++) {
+        const id = i.toString().padStart(3, '0');
+        staffUsers[id] = id;
+      }
+      localStorage.setItem('staffUsers', JSON.stringify(staffUsers));
+    }
+
+    function login() {
+      const user = document.getElementById('userid').value.trim();
+      const pass = document.getElementById('password').value.trim();
+      if (!user || !pass) return alert('Enter login credentials');
+
+      if (user === 'Murugesan' && pass === 'Muru@2025') {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('bossSection').classList.remove('hidden');
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem('staffUsers') || '{}');
+      if (users[user] && users[user] === pass) {
+        sessionStorage.setItem('userCode', user);
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('staffSection').classList.remove('hidden');
+      } else {
+        alert('Invalid login credentials');
+      }
+    }
+
+    function submitEntry() {
+      const date = document.getElementById('date').value;
+      const wallet = document.getElementById('wallet').value;
+      const closing = document.getElementById('closing').value;
+      const note = document.getElementById('note').value;
+      const staffName = document.getElementById('staffName').value;
+      const userCode = sessionStorage.getItem('userCode');
+
+      if (!date || !wallet || !closing || !staffName) {
+        return alert('Please fill all fields');
+      }
+
+      const data = new URLSearchParams();
+      data.append('date', date);
+      data.append('wallet', wallet);
+      data.append('closing', closing);
+      data.append('note', note);
+      data.append('staffName', staffName);
+      data.append('userCode', userCode);
+
+      fetch('https://script.google.com/macros/s/AKfycbwccYy-IynGKGkkfmdKCRYaL84hIiPPI5Axq61oj6uoxcLE1AudwYb8PR9_2CKHZLfw/exec', {
+        method: 'POST',
+        body: data
+      })
+      .then(res => res.text())
+      .then(res => {
+        if (res === 'Success') {
+          alert('Entry submitted!');
+          document.getElementById('date').value = '';
+          document.getElementById('wallet').value = '';
+          document.getElementById('closing').value = '';
+          document.getElementById('note').value = '';
+          document.getElementById('staffName').value = '';
+        } else {
+          alert('Submission failed');
+        }
+      })
+      .catch(err => alert('Error: ' + err));
+    }
+
+    function refreshData() {
+      alert('🔁 Refresh clicked - data would reload here.');
+    }
+
+    function logout() {
+      sessionStorage.clear();
+      location.reload();
+    }
+  </script>
+</body>
+</html>
