@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    if (!localStorage.getItem('staffUsers')) {
+      const users = {};
+      for (let i = 1; i <= 10; i++) {
+        const id = i.toString().padStart(3, '0');
+        users[id] = id;
+      }
+      localStorage.setItem('staffUsers', JSON.stringify(users));
+    }
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Prakalya Netzone</title>
@@ -58,6 +68,17 @@
   </div>
 
   <script>
+    
+    // Preload staffUsers 001 to 010 with matching passwords
+    if (!localStorage.getItem('staffUsers')) {
+      const staffUsers = {};
+      for (let i = 1; i <= 10; i++) {
+        const id = i.toString().padStart(3, '0');
+        staffUsers[id] = id;
+      }
+      localStorage.setItem('staffUsers', JSON.stringify(staffUsers));
+    }
+
     function login() {
       const user = document.getElementById('userid').value.trim();
       const pass = document.getElementById('password').value.trim();
