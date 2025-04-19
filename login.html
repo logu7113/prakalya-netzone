@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Prakalya Netzone</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f4f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    h1 {
+      color: #0056d6;
+      margin-bottom: 30px;
+    }
+    .login-box {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .login-box button {
+      width: 100%;
+      padding: 12px;
+      background-color: #0056d6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .login-box button:hover {
+      background-color: #003d9a;
+    }
+  </style>
+</head>
+<body>
+  <h1>PRAKALYA NETZONE</h1>
+  <div class="login-box">
+    <input type="text" id="userid" placeholder="User ID" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+  </div>
+
+  <script>
+    function login() {
+      const user = document.getElementById('userid').value.trim();
+      const pass = document.getElementById('password').value.trim();
+
+      if (!user || !pass) {
+        alert('Enter both ID and password');
+        return;
+      }
+
+      // Boss Login (hardcoded)
+      if (user === 'Murugesan' && pass === 'Muru@2025') {
+        sessionStorage.setItem('role', 'boss');
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
+      // Check from local storage (staff login validation)
+      const users = JSON.parse(localStorage.getItem('staffUsers')) || {};
+      if (users[user] && users[user] === pass) {
+        sessionStorage.setItem('role', 'staff');
+        sessionStorage.setItem('userCode', user);
+        window.location.href = 'entry.html';
+      } else {
+        alert('Invalid login credentials');
+      }
+    }
+  </script>
+</body>
+</html>
